@@ -1,0 +1,86 @@
+name: "Microsoft App Center Actions - Build Upload"
+
+description: "Upload builds to Microsoft App Center"
+
+branding:
+  icon: "arrow-up"
+  color: "blue"
+
+inputs:
+  appName:
+    description: "username followed by App name e.g. wzieba/Sample-App"
+    required: true
+  token:
+    description: "Upload token - you can get one from appcenter.ms/settings"
+    required: true
+  group:
+    description: "Distribution group (or multiple groups split by ; delimiter)"
+    required: true
+  file:
+    description: "Artifact to upload (.apk or .ipa)"
+    required: true
+  buildVersion:
+    description: "Build version parameter required for .zip, .msi, .pkg and .dmg files"
+  buildNumber:
+    description: "Build number parameter required for macOS .pkg and .dmg files"
+  releaseNotes:
+    description: "Release notes visible on release page"
+  gitReleaseNotes:
+    description: "Generate release notes based on the latest git commit"
+  notifyTesters:
+    description: "If set to true, an email notification is sent to the distribution group"
+  debug:
+    description: "If set to true, shows useful debug information from the action execution."
+  symbolPath:
+    description: "Path to the symbols file"
+  symbolType:
+    description: "Type of the symbols file. Can be one of: symbol, breakpad"
+  
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Setup Tools
+      run: sudo npm install --location=global appcenter-cli
+      shell: bash
+
+    - name: Upload Build
+      run: |
+        RELEASE_NOTES=""
+        isFirst=true
+        releaseId=""
+        export IFS=";"
+        params=()
+        [ "${{ inputs.notifyTesters }}" != true ] && params+=(--silent)
+        [ "${{ inputs.debug }}" == true ] && params+=(--debug)
+        if [ -n "${{ inputs.releaseNotes }}" ]; then
+            RELEASE_NOTES=${{ inputs.releaseNotes }}
+        elif [ "${{ inputs.gitReleaseNotes }}" ]; then
+            RELEASE_NOTES="$(git log -1 --pretty=short)"
+        fi
+
+        if [ -n "${{ inputs.buildVersion }}" ]; then
+            params+=(--build-version "${{ inputs.buildVersion }}")
+        fi
+
+        if [ -n "${{ inputs.buildNumber }}" ]; then
+            params+=(--build-number "${{ inputs.buildNumber }}")
+        fi
+
+        for group in ${{ inputs.group }}; do
+            if ${isFirst} ; then
+                isFirst=false
+                appcenter distribute release --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --group $group --file "${{ inputs.file }}" --release-notes "$RELEASE_NOTES" "${params[@]}"
+                releaseId=$(appcenter distribute releases list --token "${{ inputs.token }}"  --app "${{ inputs.appName }}" | grep ID | tr -s ' ' | cut -f2 -d ' ' | sort -n -r | head -1)
+            else
+                appcenter distribute releases add-destination --token "${{ inputs.token }}" -d $group -t group -r $releaseId --app "${{ inputs.appName }}" "${params[@]}"
+            fi
+        done
+
+        if [ "${{ inputs.symbolPath }}" ]; then
+          appcenter crashes upload-symbols --${{ inputs.symbolType }} ${{ inputs.symbolPath }} --token "${{ inputs.token }}" --app "${{ inputs.appName }}"
+        fi
+      shell: bash
