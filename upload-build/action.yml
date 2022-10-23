@@ -42,7 +42,6 @@ runs:
     - uses: actions/setup-node@v3
       with:
         node-version: 16
-        cache: 'npm'
 
     - name: Setup Tools
       uses: Madrona-Games/os-specific-run@v1
