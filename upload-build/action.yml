@@ -44,7 +44,11 @@ runs:
         node-version: 16
 
     - name: Setup Tools
-      run: sudo npm install --location=global appcenter-cli
+      uses: knicknic/os-specific-run@v1.0.4
+      with:
+        macos: sudo npm install --location=global appcenter-cli
+        linux: sudo npm install --location=global appcenter-cli
+        windows: npm install --location=global appcenter-cli
 
     - name: Upload Build
       run: |
