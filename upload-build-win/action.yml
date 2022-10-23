@@ -44,7 +44,7 @@ runs:
         node-version: 16
 
     - name: Setup Tools
-      run: sudo npm install --location=global appcenter-cli
+      run: npm install --location=global appcenter-cli
 
     - name: Upload Build
       run: |
