@@ -44,7 +44,7 @@ runs:
         node-version: 16
 
     - name: Setup Tools
-      uses: knicknic/os-specific-run@v1.0.4
+      uses: Madrona-Games/os-specific-run@v1
       with:
         macos: sudo npm install --location=global appcenter-cli
         linux: sudo npm install --location=global appcenter-cli
