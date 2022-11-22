@@ -35,6 +35,12 @@ inputs:
     description: "Path to the symbols file"
   symbolType:
     description: "Type of the symbols file. Can be one of: symbol, breakpad"
+  buildVersion:
+    description: "Build version of the uploaded build"
+  androidVersionCode:
+    description: "Android version code of the uploaded build"
+  mappingFilePath:
+    description: "Path to the mapping file"
   
 runs:
   using: "composite"
@@ -85,5 +91,9 @@ runs:
 
         if [ "${{ inputs.symbolPath }}" ]; then
           appcenter crashes upload-symbols --${{ inputs.symbolType }} ${{ inputs.symbolPath }} --token "${{ inputs.token }}" --app "${{ inputs.appName }}"
+        fi
+
+        if [ "${{ inputs.mappingFilePath }}" ]; then
+          appcenter crashes upload-mappings --mapping ${{ inputs.mappingFilePath }} --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --version-name "${{ inputs.buildVersion }}" --version-code "${{ inputs.androidVersionCode }}"
         fi
       shell: bash
