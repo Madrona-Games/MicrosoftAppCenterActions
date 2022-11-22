@@ -21,8 +21,6 @@ inputs:
     required: true
   buildVersion:
     description: "Build version parameter required for .zip, .msi, .pkg and .dmg files"
-  buildNumber:
-    description: "Build number parameter required for macOS .pkg and .dmg files"
   releaseNotes:
     description: "Release notes visible on release page"
   gitReleaseNotes:
@@ -35,8 +33,6 @@ inputs:
     description: "Path to the symbols file"
   symbolType:
     description: "Type of the symbols file. Can be one of: symbol, breakpad"
-  buildVersion:
-    description: "Build version of the uploaded build"
   androidVersionCode:
     description: "Android version code of the uploaded build"
   mappingFilePath:
@@ -75,8 +71,8 @@ runs:
             params+=(--build-version "${{ inputs.buildVersion }}")
         fi
 
-        if [ -n "${{ inputs.buildNumber }}" ]; then
-            params+=(--build-number "${{ inputs.buildNumber }}")
+        if [ -n "${{ inputs.androidVersionCode }}" ]; then
+            params+=(--build-number "${{ inputs.androidVersionCode }}")
         fi
 
         for group in ${{ inputs.group }}; do
