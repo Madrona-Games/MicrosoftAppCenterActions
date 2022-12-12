@@ -64,8 +64,8 @@ runs:
         [ "${{ inputs.notifyTesters }}" != true ] && params+=(--silent)
         [ "${{ inputs.debug }}" == true ] && params+=(--debug)
 
-        if [ -n "${{ inputs.gitDirectory"]; then
-            pushd ${{ inputs.gitDirectory }}
+        if [ -n "${{ inputs.gitDirectory }}"]; then
+            pushd "${{ inputs.gitDirectory }}"
         fi
 
         if [ -n "${{ inputs.releaseNotes }}" ]; then
