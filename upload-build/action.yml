@@ -95,10 +95,10 @@ runs:
         done
 
         if [ "${{ inputs.symbolPath }}" ]; then
-          appcenter crashes upload-symbols --${{ inputs.symbolType }} ${{ inputs.symbolPath }} --token "${{ inputs.token }}" --app "${{ inputs.appName }}"
+          appcenter crashes upload-symbols --${{ inputs.symbolType }} "${{ inputs.symbolPath }}" --token "${{ inputs.token }}" --app "${{ inputs.appName }}"
         fi
 
         if [ "${{ inputs.mappingFilePath }}" ]; then
-          appcenter crashes upload-mappings --mapping ${{ inputs.mappingFilePath }} --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --version-name "${{ inputs.buildVersion }}" --version-code "${{ inputs.androidVersionCode }}"
+          appcenter crashes upload-mappings --mapping "${{ inputs.mappingFilePath }}" --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --version-name "${{ inputs.buildVersion }}" --version-code "${{ inputs.androidVersionCode }}"
         fi
       shell: bash
