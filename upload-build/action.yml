@@ -37,6 +37,8 @@ inputs:
     description: "Android version code of the uploaded build"
   mappingFilePath:
     description: "Path to the mapping file"
+  workingDirectory:
+    description: "Path to working directory. Leave blank for current directory"
   
 runs:
   using: "composite"
@@ -61,6 +63,11 @@ runs:
         params=()
         [ "${{ inputs.notifyTesters }}" != true ] && params+=(--silent)
         [ "${{ inputs.debug }}" == true ] && params+=(--debug)
+
+        if [ -n "${{ inputs.workingDirectory"]; then
+            cd ${{ inputs.workingDirectory }}
+        fi
+
         if [ -n "${{ inputs.releaseNotes }}" ]; then
             RELEASE_NOTES=${{ inputs.releaseNotes }}
         elif [ "${{ inputs.gitReleaseNotes }}" ]; then
