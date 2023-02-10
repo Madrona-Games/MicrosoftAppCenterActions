@@ -39,7 +39,9 @@ inputs:
     description: "Path to the mapping file"
   gitDirectory:
     description: "Path to git directory for release notes. Leave blank for current directory"
-  
+  cliDebug:
+    description: "If set to true, shows useful debug information from the App Center CLI execution."
+
 runs:
   using: "composite"
   steps:
@@ -84,6 +86,10 @@ runs:
 
         if [ -n "${{ inputs.androidVersionCode }}" ]; then
             params+=(--build-number "${{ inputs.androidVersionCode }}")
+        fi
+
+        if [ "${{ inputs.cliDebug }}" = "true" ]; then
+            params+=(--debug)
         fi
 
         for group in ${{ inputs.group }}; do
