@@ -74,7 +74,9 @@ runs:
             RELEASE_NOTES="$(git log -1 --pretty=short)"
         fi
 
-        popd
+        if [ -n "${{ inputs.gitDirectory }}" ]; then
+            popd
+        fi
 
         if [ -n "${{ inputs.buildVersion }}" ]; then
             params+=(--build-version "${{ inputs.buildVersion }}")
