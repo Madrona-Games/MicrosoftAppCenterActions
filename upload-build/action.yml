@@ -41,76 +41,79 @@ inputs:
     description: "Path to git directory for release notes. Leave blank for current directory"
   cliDebug:
     description: "If set to true, shows useful debug information from the App Center CLI execution."
-  projectPath:
-    description: "Path to the project folder with the git repo. Leave blank for current directory"
-    default: "."
 
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
 
-    - name: Setup Tools
-      uses: Madrona-Games/os-specific-run@v1
-      with:
-        macos: sudo npm install --location=global appcenter-cli
-        linux: sudo npm install --location=global appcenter-cli
-        windows: npm install --location=global appcenter-cli
-
-    - name: Upload Build
+    - name: Debug
       run: |
-        cd ${{ inputs.projectPath }}
-        RELEASE_NOTES=""
-        isFirst=true
-        releaseId=""
-        export IFS=";"
-        params=()
-        [ "${{ inputs.notifyTesters }}" != true ] && params+=(--silent)
-        [ "${{ inputs.debug }}" == true ] && params+=(--debug)
-
-        if [ -n "${{ inputs.gitDirectory }}" ]; then
-            pushd "${{ inputs.gitDirectory }}"
-        fi
-
-        if [ -n "${{ inputs.releaseNotes }}" ]; then
-            RELEASE_NOTES=${{ inputs.releaseNotes }}
-        elif [ "${{ inputs.gitReleaseNotes }}" ]; then
-            RELEASE_NOTES="$(git log -1 --pretty=short)"
-        fi
-
-        if [ -n "${{ inputs.gitDirectory }}" ]; then
-            popd
-        fi
-
-        if [ -n "${{ inputs.buildVersion }}" ]; then
-            params+=(--build-version "${{ inputs.buildVersion }}")
-        fi
-
-        if [ -n "${{ inputs.androidVersionCode }}" ]; then
-            params+=(--build-number "${{ inputs.androidVersionCode }}")
-        fi
-
-        if [ "${{ inputs.cliDebug }}" = "true" ]; then
-            params+=(--debug)
-        fi
-
-        for group in ${{ inputs.group }}; do
-            if ${isFirst} ; then
-                isFirst=false
-                appcenter distribute release --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --group $group --file "${{ inputs.file }}" --release-notes "$RELEASE_NOTES" "${params[@]}"
-                releaseId=$(appcenter distribute releases list --token "${{ inputs.token }}"  --app "${{ inputs.appName }}" | grep ID | tr -s ' ' | cut -f2 -d ' ' | sort -n -r | head -1)
-            else
-                appcenter distribute releases add-destination --token "${{ inputs.token }}" -d $group -t group -r $releaseId --app "${{ inputs.appName }}" "${params[@]}"
-            fi
-        done
-
-        if [ "${{ inputs.symbolPath }}" ]; then
-          appcenter crashes upload-symbols --${{ inputs.symbolType }} "${{ inputs.symbolPath }}" --token "${{ inputs.token }}" --app "${{ inputs.appName }}"
-        fi
-
-        if [ "${{ inputs.mappingFilePath }}" ]; then
-          appcenter crashes upload-mappings --mapping "${{ inputs.mappingFilePath }}" --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --version-name "${{ inputs.buildVersion }}" --version-code "${{ inputs.androidVersionCode }}"
-        fi
+        pwd
+        git log -1 --pretty=short
       shell: bash
+
+    # - uses: actions/setup-node@v3
+    #   with:
+    #     node-version: 16
+
+    # - name: Setup Tools
+    #   uses: Madrona-Games/os-specific-run@v1
+    #   with:
+    #     macos: sudo npm install --location=global appcenter-cli
+    #     linux: sudo npm install --location=global appcenter-cli
+    #     windows: npm install --location=global appcenter-cli
+
+    # - name: Upload Build
+    #   run: |
+    #     RELEASE_NOTES=""
+    #     isFirst=true
+    #     releaseId=""
+    #     export IFS=";"
+    #     params=()
+    #     [ "${{ inputs.notifyTesters }}" != true ] && params+=(--silent)
+    #     [ "${{ inputs.debug }}" == true ] && params+=(--debug)
+
+    #     if [ -n "${{ inputs.gitDirectory }}" ]; then
+    #         pushd "${{ inputs.gitDirectory }}"
+    #     fi
+
+    #     if [ -n "${{ inputs.releaseNotes }}" ]; then
+    #         RELEASE_NOTES=${{ inputs.releaseNotes }}
+    #     elif [ "${{ inputs.gitReleaseNotes }}" ]; then
+    #         RELEASE_NOTES="$(git log -1 --pretty=short)"
+    #     fi
+
+    #     if [ -n "${{ inputs.gitDirectory }}" ]; then
+    #         popd
+    #     fi
+
+    #     if [ -n "${{ inputs.buildVersion }}" ]; then
+    #         params+=(--build-version "${{ inputs.buildVersion }}")
+    #     fi
+
+    #     if [ -n "${{ inputs.androidVersionCode }}" ]; then
+    #         params+=(--build-number "${{ inputs.androidVersionCode }}")
+    #     fi
+
+    #     if [ "${{ inputs.cliDebug }}" = "true" ]; then
+    #         params+=(--debug)
+    #     fi
+
+    #     for group in ${{ inputs.group }}; do
+    #         if ${isFirst} ; then
+    #             isFirst=false
+    #             appcenter distribute release --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --group $group --file "${{ inputs.file }}" --release-notes "$RELEASE_NOTES" "${params[@]}"
+    #             releaseId=$(appcenter distribute releases list --token "${{ inputs.token }}"  --app "${{ inputs.appName }}" | grep ID | tr -s ' ' | cut -f2 -d ' ' | sort -n -r | head -1)
+    #         else
+    #             appcenter distribute releases add-destination --token "${{ inputs.token }}" -d $group -t group -r $releaseId --app "${{ inputs.appName }}" "${params[@]}"
+    #         fi
+    #     done
+
+    #     if [ "${{ inputs.symbolPath }}" ]; then
+    #       appcenter crashes upload-symbols --${{ inputs.symbolType }} "${{ inputs.symbolPath }}" --token "${{ inputs.token }}" --app "${{ inputs.appName }}"
+    #     fi
+
+    #     if [ "${{ inputs.mappingFilePath }}" ]; then
+    #       appcenter crashes upload-mappings --mapping "${{ inputs.mappingFilePath }}" --token "${{ inputs.token }}" --app "${{ inputs.appName }}" --version-name "${{ inputs.buildVersion }}" --version-code "${{ inputs.androidVersionCode }}"
+    #     fi
+    #   shell: bash
