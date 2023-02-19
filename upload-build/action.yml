@@ -73,7 +73,7 @@ runs:
         if [ -n "${{ inputs.releaseNotes }}" ]; then
             RELEASE_NOTES=${{ inputs.releaseNotes }}
         elif [ "${{ inputs.gitReleaseNotes }}" ]; then
-            RELEASE_NOTES="$(git log -1 --pretty=short)"
+            RELEASE_NOTES="$(git log -1 --format="Commit: %H%nRelease Notes%n%n    %s%n%n%w(0,4,4)%b" | sed 's/^    /        /g')"
         fi
 
         if [ -n "${{ inputs.gitDirectory }}" ]; then
