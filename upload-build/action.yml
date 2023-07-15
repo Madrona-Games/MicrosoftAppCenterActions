@@ -63,6 +63,8 @@ runs:
         releaseId=""
         export IFS=";"
         params=()
+        BASE_PATH=$(pwd)
+
         [ "${{ inputs.notifyTesters }}" != true ] && params+=(--silent)
         [ "${{ inputs.debug }}" == true ] && params+=(--debug)
 
@@ -71,9 +73,9 @@ runs:
         fi
 
         if [ -n "${{ inputs.releaseNotes }}" ]; then
-            RELEASE_NOTES="${{ inputs.releaseNotes }}"
+            echo "${{ inputs.releaseNotes }}" > $BASE_PATH/release_notes_app_center.txt
         elif [ "${{ inputs.gitReleaseNotes }}" ]; then
-            RELEASE_NOTES="$(git log -1 --format="${{ inputs.releaseNotesHeader }}%nCommit: %H%nRelease Notes%n%n    %s%n%n%w(0,4,4)%b" | sed 's/^    /        /g')"
+            git log -1 --format="**${{ inputs.releaseNotesHeader }}**%n%nCommit: %H%n%nChanges:%n%n    %s%n%n%w(0,4,4)%b" | sed 's/^    /        /g' > $BASE_PATH/release_notes_app_center.txt
         fi
 
         if [ -n "${{ inputs.gitDirectory }}" ]; then
@@ -99,7 +101,7 @@ runs:
                 --app "${{ inputs.appName }}" \
                 --group $group \
                 --file "${{ inputs.file }}" \
-                --release-notes "$RELEASE_NOTES" \
+                --release-notes-file $BASE_PATH/release_notes_app_center.txt \
                 "${params[@]}"
                 
                 # Remember the release ID for other groups we may want to distribute to
@@ -135,4 +137,8 @@ runs:
           --version-name "${{ inputs.buildVersion }}" \
           --version-code "${{ inputs.androidVersionCode }}"
         fi
+
+        # Cleanup
+        rm $BASE_PATH/release_notes_app_center.txt
+
       shell: bash
