@@ -49,6 +49,8 @@ runs:
       run: |
         # Fix for self hosted runner losing npm PATH
         PATH=$PATH:"/c/Users/runneradmin/AppData/Roaming/npm"
+        echo $PATH
+
 
         RELEASE_NOTES=""
         isFirst=true
