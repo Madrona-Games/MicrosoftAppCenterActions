@@ -47,6 +47,9 @@ runs:
   steps:
     - name: Upload Build
       run: |
+        # Fix for self hosted runner losing npm PATH
+        PATH=$PATH:"/c/Users/runneradmin/AppData/Roaming/npm"
+
         RELEASE_NOTES=""
         isFirst=true
         releaseId=""
