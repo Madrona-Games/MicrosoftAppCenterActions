@@ -17,7 +17,7 @@ inputs:
     description: "Distribution group (or multiple groups split by ; delimiter)"
     required: true
   file:
-    description: "Artifact to upload (.apk or .ipa)"
+    description: "Artifact to upload (.aab/.apk or .ipa)"
     required: true
   buildVersion:
     description: "Build version parameter required for .zip, .msi, .pkg and .dmg files"
@@ -45,17 +45,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16
-
-    - name: Setup Tools
-      uses: Madrona-Games/os-specific-run@v1
-      with:
-        macos: sudo npm install --location=global appcenter-cli
-        linux: sudo npm install --location=global appcenter-cli
-        windows: npm install --location=global appcenter-cli
-
     - name: Upload Build
       run: |
         RELEASE_NOTES=""
