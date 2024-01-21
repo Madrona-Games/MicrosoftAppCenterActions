@@ -47,8 +47,6 @@ runs:
   steps:
     - name: Upload Build
       run: |
-        ls -lashi /c/Users/runneradmin/AppData/Roaming/npm
-
         RELEASE_NOTES=""
         isFirst=true
         releaseId=""
