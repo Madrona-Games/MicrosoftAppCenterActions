@@ -64,7 +64,7 @@ runs:
         if [ -n "${{ inputs.releaseNotes }}" ]; then
             echo "${{ inputs.releaseNotes }}" > $BASE_PATH/release_notes_app_center.txt
         elif [ "${{ inputs.gitReleaseNotes }}" ]; then
-            git log -1 --format="**${{ inputs.releaseNotesHeader }}**%n%nCommit: %H%n%nChanges:%n%n    %s%n%n%w(0,4,4)%b" | sed 's/^    /        /g' > $BASE_PATH/release_notes_app_center.txt
+            git log -1 --format="${{ inputs.releaseNotesHeader }}%n%nCommit: %H%n%nChanges:%n%n    %s%n%n%w(0,4,4)%b" | sed 's/^    /        /g' > $BASE_PATH/release_notes_app_center.txt
         fi
 
         if [ -n "${{ inputs.gitDirectory }}" ]; then
